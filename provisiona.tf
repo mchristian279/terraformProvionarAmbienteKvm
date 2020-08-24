@@ -17,7 +17,16 @@ variable "disk_img" {
 
 variable "vm_network_addresses" {
   description = "Configura Rede"
-  default     = "192.168.130.0/24"
+  default     = "192.168.10.0/24"
+}
+
+variable "vm_addresses" {
+  default = {
+    "0" = "192.168.10.10"
+    "1" = "192.168.10.11"
+    "2" = "192.168.10.12"
+  }
+
 }
 
 variable "vm_network_name" {
@@ -51,11 +60,9 @@ resource "libvirt_network" "vm_network" {
   name      = var.vm_network_name
   addresses = ["${var.vm_network_addresses}"]
   domain    = var.domain_name
-
-  mode = "nat"
-
+  mode      = "nat"
   dhcp {
-    enabled = true
+    enabled = false
   }
 
   dns {
@@ -74,7 +81,9 @@ resource "libvirt_domain" "domain" {
   network_interface {
     network_id     = libvirt_network.vm_network.id
     hostname       = "cloudera-${count.index}"
+    addresses      = ["${var.vm_addresses[count.index]}"]
     wait_for_lease = true
+
   }
 
   disk {

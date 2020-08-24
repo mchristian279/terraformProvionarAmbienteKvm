@@ -12,7 +12,7 @@ variable "instance_count" {
 }
 
 variable "disk_img" {
-  default = "file:///Dados/Vms/centos7.0"
+  default = "file:///home/mreis/Imagens/CentOS-7-x86_64-GenericCloud-1511.qcow2"
 }
 
 variable "vm_network_addresses" {
@@ -39,7 +39,8 @@ resource "libvirt_volume" "os_image" {
 
 #Volume
 resource "libvirt_volume" "volume" {
-  name           = "volume-${count.index}"
+  name           = "cloudera-${count.index}"
+  pool           = "Dados"
   base_volume_id = libvirt_volume.os_image.id
   count          = var.instance_count
 }
@@ -67,7 +68,7 @@ resource "libvirt_network" "vm_network" {
 #VM
 resource "libvirt_domain" "domain" {
   name   = "cloudera-${count.index}"
-  memory = "8192"
+  memory = "1024"
   vcpu   = "2"
 
   network_interface {
